@@ -35,36 +35,48 @@ A lightweight CLI tool for testing HTTP endpoints with curl-style commands and s
 
 ## Installation
 
-### macOS and Linux (Recommended)
+### Quick Install (Recommended)
 
-Install via script:
+**macOS and Linux:**
 ```bash
 curl -sL https://raw.githubusercontent.com/jonhadfield/curlex/main/install | sh
 ```
 
-### macOS (Homebrew)
-
+**Homebrew:**
 ```bash
 brew tap jonhadfield/curlex
 brew install curlex
 ```
 
-### From Source
+**Docker:**
+```bash
+docker pull jonhadfield/curlex:latest
+docker run -v $(pwd)/tests.yaml:/tests.yaml jonhadfield/curlex /tests.yaml
+```
 
-Requires Go 1.21 or later:
+**Pre-built Binaries:**
 
+Download from [GitHub Releases](https://github.com/jonhadfield/curlex/releases) for:
+- Linux (amd64, arm64)
+- macOS (Intel, Apple Silicon)
+- Windows (amd64, arm64)
+
+**From Source:**
+
+Requires Go 1.24 or later:
 ```bash
 git clone https://github.com/jonhadfield/curlex.git
 cd curlex
 make build
-sudo mv curlex /usr/local/bin/
+sudo make install
 ```
 
 Or with Go directly:
-
 ```bash
 go install github.com/jonhadfield/curlex/cmd/curlex@latest
 ```
+
+📖 **Full installation guide:** [INSTALL.md](INSTALL.md)
 
 ## Quick Start
 
@@ -607,6 +619,12 @@ go test ./internal/runner -bench=. -benchmem
 
 # Build for multiple platforms
 make build-all
+
+# Build Docker image
+docker build -t curlex:latest .
+
+# Run in Docker
+docker run -v $(pwd)/tests.yaml:/tests.yaml curlex:latest /tests.yaml
 ```
 
 **Binary Size Optimization**:
@@ -628,13 +646,24 @@ go test ./... -coverprofile=coverage.out
 go tool cover -html=coverage.out
 ```
 
+## Distribution
+
+Curlex is distributed through multiple channels:
+
+- **GitHub Releases**: Pre-built binaries for all platforms
+- **Homebrew**: macOS and Linux package manager
+- **Docker Hub**: Container images at `jonhadfield/curlex`
+- **Go Install**: Direct installation via `go install`
+
+All releases are automatically built and published via GitHub Actions when a new version tag is pushed.
+
 ## Contributing
 
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes
 4. Add tests for new functionality
-5. Ensure all tests pass
+5. Ensure all tests pass (`make test`)
 6. Submit a pull request
 
 ## License

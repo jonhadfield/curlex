@@ -1,0 +1,36 @@
+# Build artifacts
+dist/
+curlex
+*.test
+*.out
+*.prof
+
+# Git
+.git/
+.gitignore
+
+# Documentation
+*.md
+!README.md
+docs/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# CI/CD
+.github/
+
+# Temp files
+tmp/
+logs/
+
+# Coverage
+coverage.out
+coverage.html
+
+# OS files
+.DS_Store
+Thumbs.db
