@@ -24,17 +24,17 @@ file_name="${repo}_$(get_os)_$(get_arch).tar.gz"
 downloaded_file="${downloadFolder}/${file_name}"
 asset_uri="${githubUrl}/${owner}/${repo}/releases/latest/download/${file_name}"
 
-echo "[1/2] Download ${asset_uri} to ${downloadFolder}"
+echo "[1/3] Download ${asset_uri} to ${downloadFolder}"
 rm -f "${downloaded_file}"
 curl --fail --location --output "${downloaded_file}" "${asset_uri}"
 
 echo "[2/3] Install ${repo} to ${executable_folder}"
-tar -xz -f "${downloaded_file}"
-[ "$(uname)" = "Linux" ] && sudo install -C ${repo} ${executable_folder}
-[ "$(uname)" = "darwin" ] && install -C ${repo} ${executable_folder}
+tar -xz -f "${downloaded_file}" -C "${downloadFolder}"
+sudo install -m 755 "${downloadFolder}/${repo}" "${executable_folder}/${repo}"
 
 echo "[3/3] Clean up"
-rm "${downloaded_file}"
+rm -f "${downloaded_file}"
+rm -f "${downloadFolder}/${repo}"
 
 echo "${repo} was successfully installed to ${executable_folder}/${repo}"
 

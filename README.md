@@ -18,19 +18,35 @@ A lightweight CLI tool for testing HTTP endpoints with curl-style commands and s
 
 ## Installation
 
-### From Source
+### macOS and Linux (Recommended)
+
+Install via script:
+```bash
+curl -sL https://raw.githubusercontent.com/jonhadfield/curlex/main/install | sh
+```
+
+### macOS (Homebrew)
 
 ```bash
-git clone https://github.com/yourusername/curlex.git
+brew tap jonhadfield/curlex
+brew install curlex
+```
+
+### From Source
+
+Requires Go 1.21 or later:
+
+```bash
+git clone https://github.com/jonhadfield/curlex.git
 cd curlex
-go build -o curlex ./cmd/curlex
+make build
 sudo mv curlex /usr/local/bin/
 ```
 
-### Quick Build
+Or with Go directly:
 
 ```bash
-make build
+go install github.com/jonhadfield/curlex/cmd/curlex@latest
 ```
 
 ## Quick Start
