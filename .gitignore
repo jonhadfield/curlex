@@ -1,0 +1,9 @@
+coverage.out
+curlex
+*.prof
+*.test
+*.md
+!README.md
+*.yaml
+!testdata/*.yaml
+*.json
