@@ -1,52 +1,47 @@
 version: "1.0"
 
-variables:
-  BASE_URL: "https://httpbin.org"
+# Example tests demonstrating retry functionality
 
-# Global defaults with retry configuration
 defaults:
-  retries: 3
-  retry_delay: "500ms"
+  retries: 2
+  retry_delay: "1s"
   retry_backoff: "exponential"
-  retry_on_status: [500, 502, 503, 504]
+  timeout: 10s
 
 tests:
-  # Test 1: No retry needed - successful response
-  - name: "Success - no retry"
-    curl: "curl ${BASE_URL}/status/200"
+  - name: "Test with default retry settings"
+    curl: "curl https://httpbin.org/status/503"
+    retry_on_status: [500, 502, 503, 504]
+    assertions:
+      - status: 200  # Will fail after retries
+
+  - name: "Test with custom retry settings"
+    curl: "curl https://httpbin.org/status/200"
+    retries: 3
+    retry_delay: "500ms"
+    retry_backoff: "linear"
     assertions:
       - status: 200
 
-  # Test 2: Retry on 503 status (will eventually fail after retries)
-  - name: "Retry on 503 - will fail"
-    curl: "curl ${BASE_URL}/status/503"
-    retries: 2
+  - name: "Test with no retries"
+    curl: "curl https://httpbin.org/get"
+    retries: 0
+    assertions:
+      - status: 200
+      - json_path: ".url == 'https://httpbin.org/get'"
+
+  - name: "Test retry only on specific status codes"
+    curl: "curl https://httpbin.org/status/200"
+    retries: 3
+    retry_on_status: [429, 503, 504]
+    assertions:
+      - status: 200
+
+  - name: "Test exponential backoff"
+    curl: "curl https://httpbin.org/delay/1"
+    retries: 3
     retry_delay: "100ms"
-    retry_backoff: "linear"
-    assertions:
-      - status: 200  # This will fail after retries
-
-  # Test 3: No retry on 404 (not in retry_on_status list)
-  - name: "No retry on 404"
-    curl: "curl ${BASE_URL}/status/404"
-    retry_on_status: [500, 503]  # 404 not in list
-    assertions:
-      - status: 404  # Should pass immediately without retries
-
-  # Test 4: Override retry settings
-  - name: "Custom retry settings"
-    request:
-      method: GET
-      url: "${BASE_URL}/status/200"
-    retries: 5
-    retry_delay: "200ms"
     retry_backoff: "exponential"
     assertions:
       - status: 200
-
-  # Test 5: No retries configured
-  - name: "No retries"
-    curl: "curl ${BASE_URL}/status/200"
-    retries: 0  # Explicitly disable retries
-    assertions:
-      - status: 200
+      - response_time: "< 5s"

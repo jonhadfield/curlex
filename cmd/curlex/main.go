@@ -47,6 +47,20 @@ func run(cfg *config.Config) int {
 		return 1
 	}
 
+	// Apply test filtering if configured
+	filterConfig := runner.FilterConfig{
+		TestName:    cfg.TestFilter,
+		TestPattern: cfg.TestPattern,
+		SkipTests:   cfg.SkipTests,
+	}
+	suite.Tests = runner.FilterTests(suite, filterConfig)
+
+	// Check if any tests remain after filtering
+	if len(suite.Tests) == 0 {
+		fmt.Fprintf(os.Stderr, "No tests match the specified filter criteria\n")
+		return 1
+	}
+
 	// Create runner
 	testRunner := runner.NewRunner(cfg.Timeout, cfg.LogDir)
 

@@ -1,0 +1,99 @@
+version: "1.0"
+
+# Comprehensive example demonstrating all Phase 3 features:
+# - Retry logic with exponential/linear backoff
+# - Request/response logging (use --log-dir ./logs)
+# - Test filtering (use --test, --test-pattern, --skip)
+# - Defaults merging with validation
+
+variables:
+  BASE_URL: "https://httpbin.org"
+
+defaults:
+  timeout: 30s
+  retries: 2
+  retry_delay: "1s"
+  retry_backoff: "exponential"
+  retry_on_status: [500, 502, 503, 504]
+  headers:
+    User-Agent: "curlex/1.0.0"
+    Accept: "application/json"
+
+tests:
+  # API Tests - can be filtered with --test-pattern "^API"
+  - name: "API Test - GET with retries"
+    curl: "curl ${BASE_URL}/get"
+    assertions:
+      - status: 200
+      - json_path: ".headers.User-Agent == 'curlex/1.0.0'"
+      - response_time: "< 2s"
+
+  - name: "API Test - POST with retry override"
+    request:
+      method: POST
+      url: "${BASE_URL}/post"
+      headers:
+        Content-Type: "application/json"
+      body: '{"test": "data"}'
+    retries: 3
+    retry_delay: "500ms"
+    retry_backoff: "linear"
+    assertions:
+      - status: 200
+      - body_contains: "test"
+      - json_path: ".json.test == 'data'"
+
+  - name: "API Test - Delayed response"
+    curl: "curl ${BASE_URL}/delay/1"
+    timeout: 5s
+    assertions:
+      - status: 200
+      - response_time: "< 3s"
+
+  # Authentication Tests - can be filtered with --test-pattern "Auth"
+  - name: "Auth Test - Basic authentication"
+    curl: "curl -u user:pass ${BASE_URL}/basic-auth/user/pass"
+    retries: 0  # Override default
+    assertions:
+      - status: 200
+      - json_path: ".authenticated == true"
+      - json_path: ".user == 'user'"
+
+  # Failure Tests - can be skipped with --skip "Failure Test"
+  - name: "Failure Test - Will retry"
+    curl: "curl ${BASE_URL}/status/503"
+    assertions:
+      - status: 200  # Will fail after retries
+
+  # Performance Tests
+  - name: "Performance Test - Response time"
+    curl: "curl ${BASE_URL}/get"
+    assertions:
+      - status: 200
+      - response_time: "< 1s"
+
+  # Header Tests
+  - name: "Header Test - Custom headers"
+    request:
+      method: GET
+      url: "${BASE_URL}/headers"
+      headers:
+        X-Custom-Header: "test-value"
+        # User-Agent from defaults will be merged
+    assertions:
+      - status: 200
+      - json_path: ".headers.X-Custom-Header == 'test-value'"
+      - json_path: ".headers.User-Agent == 'curlex/1.0.0'"
+
+  # Redirect Tests
+  - name: "Redirect Test - Follow redirects"
+    curl: "curl ${BASE_URL}/redirect/3"
+    max_redirects: 5
+    assertions:
+      - status: 200
+
+  - name: "Redirect Test - No redirects"
+    curl: "curl ${BASE_URL}/redirect/1"
+    max_redirects: 0
+    assertions:
+      - status: 302
