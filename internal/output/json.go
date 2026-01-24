@@ -65,7 +65,7 @@ type JSONFailure struct {
 // Format converts suite results to JSON
 func (f *JSONFormatter) Format(suiteResult *models.SuiteResult) string {
 	output := JSONOutput{
-		Version:     "1.0",
+		Version:     "1.0.0",
 		TotalTests:  suiteResult.TotalTests,
 		PassedTests: suiteResult.PassedTests,
 		FailedTests: suiteResult.FailedTests,

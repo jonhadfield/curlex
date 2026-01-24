@@ -13,7 +13,7 @@ import (
 	"curlex/internal/runner"
 )
 
-const version = "0.5.0"
+const version = "1.0.0"
 
 func main() {
 	// Parse CLI flags

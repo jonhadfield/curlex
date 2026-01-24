@@ -1,0 +1,83 @@
+version: 2
+
+project_name: curlex
+
+env:
+  - GO111MODULE=on
+  - GOPROXY=https://proxy.golang.org
+  - CGO_ENABLED=0
+
+before:
+  hooks:
+    - make clean
+    - go mod tidy
+
+builds:
+  - id: curlex
+    binary: curlex
+    main: cmd/curlex/main.go
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - darwin
+      - linux
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w
+      - '-X github.com/jonhadfield/curlex/helpers.Version={{ .Version }}_{{ .Date }}_UTC'
+      - '-X github.com/jonhadfield/curlex/helpers.SemVer={{ .Tag }}'
+
+archives:
+  - id: default
+    name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
+    format: tar.gz
+    builds:
+      - curlex
+    format_overrides:
+      - goos: windows
+        format: zip
+    files:
+      - license*
+      - readme*
+      - changelog*
+      - none*
+
+checksum:
+  name_template: checksums.txt
+
+release:
+  github:
+    owner: jonhadfield
+    name: curlex
+  prerelease: auto
+  name_template: "{{ .Tag }}"
+  extra_files:
+    - glob: ./dist/curlex_darwin*.zip
+
+snapshot:
+  name_template: "{{ .Tag }}-devel"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - README*
+      - test
+      - ignore
+
+brews:
+  - name: curlex
+    homepage: https://github.com/jonhadfield/curlex
+    description: >
+      A command line tool for network administrators and security analysts to quickly identify the origin and threat of an IP address.
+    repository:
+      owner: jonhadfield
+      name: homebrew-curlex
+
+announce:
+  skip: true

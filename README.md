@@ -135,7 +135,7 @@ defaults:
   retry_on_status: [500, 502, 503, 504]  # Retry on these status codes
   max_redirects: 10             # Default: follow up to 10 redirects
   headers:                      # Default headers for all tests
-    User-Agent: "curlex/0.5.0"
+    User-Agent: "curlex/1.0.0"
 
 # Required: Test definitions
 tests:
@@ -388,7 +388,7 @@ curlex --output json tests.yaml
 ```
 ```json
 {
-  "version": "0.5.0",
+  "version": "1.0.0",
   "total_tests": 3,
   "passed_tests": 3,
   "failed_tests": 0,

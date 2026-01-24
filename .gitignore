@@ -5,5 +5,6 @@ curlex
 *.md
 !README.md
 *.yaml
+!.goreleaser.yml
 !testdata/*.yaml
 *.json
