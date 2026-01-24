@@ -1,0 +1,46 @@
+version: "1.0"
+
+# Test case-insensitive header matching
+variables:
+  BASE_URL: "https://httpbin.org"
+
+tests:
+  # Test 1: Lowercase header name in assertion
+  - name: "Header assertion - lowercase"
+    curl: "curl ${BASE_URL}/get"
+    assertions:
+      - status: 200
+      - header: "content-type contains json"  # lowercase header name
+
+  # Test 2: Uppercase header name in assertion
+  - name: "Header assertion - uppercase"
+    curl: "curl ${BASE_URL}/get"
+    assertions:
+      - status: 200
+      - header: "CONTENT-TYPE contains json"  # uppercase header name
+
+  # Test 3: Mixed case header name in assertion
+  - name: "Header assertion - mixed case"
+    curl: "curl ${BASE_URL}/get"
+    assertions:
+      - status: 200
+      - header: "Content-Type contains json"  # standard case
+
+  # Test 4: Different casing variations
+  - name: "Header assertion - various casings"
+    request:
+      method: GET
+      url: "${BASE_URL}/response-headers?X-Custom-Header=TestValue"
+    assertions:
+      - status: 200
+      - header: "x-custom-header == TestValue"  # lowercase
+      - header: "X-CUSTOM-HEADER == TestValue"  # uppercase
+      - header: "X-Custom-Header == TestValue"  # standard case
+
+  # Test 5: Debug flag demonstration
+  - name: "Debug output test"
+    curl: "curl -X POST ${BASE_URL}/post -H 'Content-Type: application/json' -d '{\"key\":\"value\"}'"
+    debug: true  # Enable debug output
+    assertions:
+      - status: 200
+      - json_path: ".json.key == 'value'"

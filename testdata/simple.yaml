@@ -1,0 +1,22 @@
+version: "1.0"
+
+tests:
+  - name: "GET request to httpbin"
+    curl: "curl https://httpbin.org/get"
+    assertions:
+      - status: 200
+
+  - name: "POST request with JSON"
+    request:
+      method: POST
+      url: "https://httpbin.org/post"
+      headers:
+        Content-Type: "application/json"
+      body: '{"test": "data"}'
+    assertions:
+      - status: 200
+
+  - name: "Status code should be 404"
+    curl: "curl https://httpbin.org/status/404"
+    assertions:
+      - status: 404

@@ -1,0 +1,116 @@
+version: "1.0"
+
+# Variables with environment substitution
+variables:
+  BASE_URL: "https://httpbin.org"
+  EXPECTED_STATUS: "200"
+
+# Optional: Global defaults for all tests
+defaults:
+  max_redirects: 10  # Default: follow up to 10 redirects
+
+tests:
+  # Test 1: Variable substitution
+  - name: "GET with variables"
+    curl: "curl ${BASE_URL}/get"
+    assertions:
+      - status: 200
+      - header: "Content-Type contains json"
+      - response_time: "< 5s"
+
+  # Test 2: JSON path assertions
+  - name: "JSON path validation"
+    request:
+      method: GET
+      url: "${BASE_URL}/get"
+    assertions:
+      - status: 200
+      - json_path: ".url == 'https://httpbin.org/get'"
+      - json_path: ".headers != null"
+
+  # Test 3: POST with body contains
+  - name: "POST with body validation"
+    request:
+      method: POST
+      url: "${BASE_URL}/post"
+      headers:
+        Content-Type: "application/json"
+      body: '{"name": "curlex", "version": "0.2.0"}'
+    assertions:
+      - status: 200
+      - body_contains: "curlex"
+      - body_contains: "0.2.0"
+      - json_path: ".json.name == 'curlex'"
+      - json_path: ".json.version == '0.2.0'"
+
+  # Test 4: Headers validation
+  - name: "Headers check"
+    curl: "curl ${BASE_URL}/response-headers?Content-Type=application/json"
+    assertions:
+      - status: 200
+      - header: "Content-Type contains json"
+
+  # Test 5: Response time check
+  - name: "Fast response"
+    curl: "curl ${BASE_URL}/delay/0"
+    assertions:
+      - status: 200
+      - response_time: "< 2s"
+
+  # Test 6: Multiple assertion types
+  - name: "Comprehensive validation"
+    request:
+      method: POST
+      url: "${BASE_URL}/anything"
+      headers:
+        User-Agent: "curlex/0.2.0"
+        Accept: "application/json"
+      body: '{"test": true, "value": 42}'
+    assertions:
+      - status: 200
+      - header: "Content-Type contains json"
+      - body_contains: "curlex"
+      - json_path: ".json.test == true"
+      - json_path: ".json.value == 42"
+      - json_path: ".headers.User-Agent == 'curlex/0.2.0'"
+      - response_time: "< 3s"
+
+  # Test 7: No redirects allowed
+  - name: "No redirects - catch redirect response"
+    request:
+      method: GET
+      url: "${BASE_URL}/redirect/1"
+    max_redirects: 0  # Don't follow redirects
+    assertions:
+      - status: 302  # Expect redirect status
+      - header: "Location != null"
+
+  # Test 8: Limited redirects
+  - name: "Follow up to 2 redirects"
+    request:
+      method: GET
+      url: "${BASE_URL}/redirect/1"
+    max_redirects: 2  # Allow up to 2 redirects
+    assertions:
+      - status: 200  # After 1 redirect, should succeed
+
+  # Test 9: Absolute redirect (no redirect needed)
+  - name: "Absolute redirect test"
+    curl: "curl ${BASE_URL}/absolute-redirect/1"
+    max_redirects: 5  # Allow up to 5 redirects
+    assertions:
+      - status: 200
+
+  # Test 10: Debug mode demonstration
+  - name: "Debug mode - troubleshooting"
+    request:
+      method: POST
+      url: "${BASE_URL}/anything"
+      headers:
+        X-Request-ID: "debug-test-123"
+        User-Agent: "curlex/0.3.0"
+      body: '{"environment":"test","timestamp":"2025-01-21"}'
+    debug: true  # Enable debug output
+    assertions:
+      - status: 200
+      - json_path: ".json.environment == 'test'"

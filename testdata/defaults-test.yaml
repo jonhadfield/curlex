@@ -1,0 +1,54 @@
+version: "1.0"
+
+variables:
+  BASE_URL: "https://httpbin.org"
+
+# Global defaults for all tests
+defaults:
+  timeout: 5s
+  retries: 2
+  max_redirects: 3
+  headers:
+    User-Agent: "curlex/0.3.0"
+    Accept: "application/json"
+
+tests:
+  # Test 1: Uses all defaults
+  - name: "Test with defaults"
+    request:
+      method: GET
+      url: "${BASE_URL}/headers"
+    assertions:
+      - status: 200
+      - json_path: ".headers.User-Agent == 'curlex/0.3.0'"
+      - json_path: ".headers.Accept == 'application/json'"
+
+  # Test 2: Overrides User-Agent but keeps Accept
+  - name: "Partial header override"
+    request:
+      method: GET
+      url: "${BASE_URL}/headers"
+      headers:
+        User-Agent: "custom-agent/1.0"
+    assertions:
+      - status: 200
+      - json_path: ".headers.User-Agent == 'custom-agent/1.0'"
+      - json_path: ".headers.Accept == 'application/json'"
+
+  # Test 3: Overrides timeout
+  - name: "Override timeout"
+    request:
+      method: GET
+      url: "${BASE_URL}/delay/1"
+    timeout: 10s  # Override default 5s
+    assertions:
+      - status: 200
+      - response_time: "< 3s"
+
+  # Test 4: Overrides max_redirects
+  - name: "Override redirects"
+    curl: "curl ${BASE_URL}/redirect/1"
+    max_redirects: 0  # Override default 3
+    assertions:
+      - status: 302
+      - header: "Location != null"

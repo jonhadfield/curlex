@@ -1,0 +1,17 @@
+version: "1.0"
+
+tests:
+  - name: "This should pass"
+    curl: "curl https://httpbin.org/status/200"
+    assertions:
+      - status: 200
+
+  - name: "This should fail - wrong status"
+    curl: "curl https://httpbin.org/status/404"
+    assertions:
+      - status: 200
+
+  - name: "This should pass - status range"
+    curl: "curl https://httpbin.org/status/201"
+    assertions:
+      - status: ">= 200 && < 300"
