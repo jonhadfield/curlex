@@ -113,15 +113,15 @@ func run(cfg *config.Config) int {
 			junitFormatter := output.NewJUnitFormatter()
 			fmt.Print(junitFormatter.Format(suiteResult))
 		default: // "human" or verbose
-		var formatter interface {
-			FormatResult(models.TestResult) string
-			FormatSummary([]models.TestResult, time.Duration) string
-		}
-		if cfg.Verbose {
-			formatter = output.NewVerboseFormatter(cfg.NoColor)
-		} else {
-			formatter = output.NewHumanFormatter(cfg.NoColor)
-		}
+			var formatter interface {
+				FormatResult(models.TestResult) string
+				FormatSummary([]models.TestResult, time.Duration) string
+			}
+			if cfg.Verbose {
+				formatter = output.NewVerboseFormatter(cfg.NoColor)
+			} else {
+				formatter = output.NewHumanFormatter(cfg.NoColor)
+			}
 
 			// Output results
 			for _, result := range suiteResult.Results {

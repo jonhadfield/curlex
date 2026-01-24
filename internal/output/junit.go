@@ -34,12 +34,12 @@ type JUnitTestSuite struct {
 
 // JUnitTestCase represents a single test case
 type JUnitTestCase struct {
-	Name      string          `xml:"name,attr"`
-	Classname string          `xml:"classname,attr"`
-	Time      float64         `xml:"time,attr"`
-	Failure   *JUnitFailure   `xml:"failure,omitempty"`
-	Error     *JUnitError     `xml:"error,omitempty"`
-	SystemOut string          `xml:"system-out,omitempty"`
+	Name      string        `xml:"name,attr"`
+	Classname string        `xml:"classname,attr"`
+	Time      float64       `xml:"time,attr"`
+	Failure   *JUnitFailure `xml:"failure,omitempty"`
+	Error     *JUnitError   `xml:"error,omitempty"`
+	SystemOut string        `xml:"system-out,omitempty"`
 }
 
 // JUnitFailure represents a test failure

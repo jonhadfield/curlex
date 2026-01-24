@@ -29,14 +29,14 @@ type JSONOutput struct {
 
 // JSONTestResult represents a single test result in JSON format
 type JSONTestResult struct {
-	Name         string              `json:"name"`
-	Success      bool                `json:"success"`
-	StatusCode   int                 `json:"status_code,omitempty"`
-	ResponseTime string              `json:"response_time,omitempty"`
-	Error        string              `json:"error,omitempty"`
-	Failures     []JSONFailure       `json:"failures,omitempty"`
-	Request      *JSONRequest        `json:"request,omitempty"`
-	Response     *JSONResponse       `json:"response,omitempty"`
+	Name         string        `json:"name"`
+	Success      bool          `json:"success"`
+	StatusCode   int           `json:"status_code,omitempty"`
+	ResponseTime string        `json:"response_time,omitempty"`
+	Error        string        `json:"error,omitempty"`
+	Failures     []JSONFailure `json:"failures,omitempty"`
+	Request      *JSONRequest  `json:"request,omitempty"`
+	Response     *JSONResponse `json:"response,omitempty"`
 }
 
 // JSONRequest represents request details in JSON format

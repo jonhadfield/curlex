@@ -9,20 +9,20 @@ import (
 
 // Config holds the CLI configuration
 type Config struct {
-	TestFile    string
-	Timeout     time.Duration
-	NoColor     bool
-	Version     bool
-	Verbose     bool
-	LogDir      string
-	TestFilter  string
-	TestPattern string
-	SkipTests   string
-	Parallel    bool
-	Concurrency int
-	FailFast    bool
+	TestFile     string
+	Timeout      time.Duration
+	NoColor      bool
+	Version      bool
+	Verbose      bool
+	LogDir       string
+	TestFilter   string
+	TestPattern  string
+	SkipTests    string
+	Parallel     bool
+	Concurrency  int
+	FailFast     bool
 	OutputFormat string
-	Quiet       bool
+	Quiet        bool
 }
 
 // ParseFlags parses command-line flags and returns configuration

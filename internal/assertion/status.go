@@ -12,20 +12,20 @@ import (
 // Pre-compiled regex patterns for status code comparisons
 var (
 	// "operator number" patterns (actual is left operand)
-	statusPatternGTE     = regexp.MustCompile(`^\s*>=\s*(\d+)`)
-	statusPatternLTE     = regexp.MustCompile(`^\s*<=\s*(\d+)`)
-	statusPatternGT      = regexp.MustCompile(`^\s*>\s*(\d+)`)
-	statusPatternLT      = regexp.MustCompile(`^\s*<\s*(\d+)`)
-	statusPatternEQ      = regexp.MustCompile(`^\s*==\s*(\d+)`)
-	statusPatternNEQ     = regexp.MustCompile(`^\s*!=\s*(\d+)`)
+	statusPatternGTE = regexp.MustCompile(`^\s*>=\s*(\d+)`)
+	statusPatternLTE = regexp.MustCompile(`^\s*<=\s*(\d+)`)
+	statusPatternGT  = regexp.MustCompile(`^\s*>\s*(\d+)`)
+	statusPatternLT  = regexp.MustCompile(`^\s*<\s*(\d+)`)
+	statusPatternEQ  = regexp.MustCompile(`^\s*==\s*(\d+)`)
+	statusPatternNEQ = regexp.MustCompile(`^\s*!=\s*(\d+)`)
 
 	// "number operator number" patterns
-	statusPatternNumGTE  = regexp.MustCompile(`(\d+)\s*>=\s*(\d+)`)
-	statusPatternNumLTE  = regexp.MustCompile(`(\d+)\s*<=\s*(\d+)`)
-	statusPatternNumGT   = regexp.MustCompile(`(\d+)\s*>\s*(\d+)`)
-	statusPatternNumLT   = regexp.MustCompile(`(\d+)\s*<\s*(\d+)`)
-	statusPatternNumEQ   = regexp.MustCompile(`(\d+)\s*==\s*(\d+)`)
-	statusPatternNumNEQ  = regexp.MustCompile(`(\d+)\s*!=\s*(\d+)`)
+	statusPatternNumGTE = regexp.MustCompile(`(\d+)\s*>=\s*(\d+)`)
+	statusPatternNumLTE = regexp.MustCompile(`(\d+)\s*<=\s*(\d+)`)
+	statusPatternNumGT  = regexp.MustCompile(`(\d+)\s*>\s*(\d+)`)
+	statusPatternNumLT  = regexp.MustCompile(`(\d+)\s*<\s*(\d+)`)
+	statusPatternNumEQ  = regexp.MustCompile(`(\d+)\s*==\s*(\d+)`)
+	statusPatternNumNEQ = regexp.MustCompile(`(\d+)\s*!=\s*(\d+)`)
 )
 
 // StatusValidator validates HTTP status code assertions

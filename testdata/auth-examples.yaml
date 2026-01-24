@@ -1,0 +1,125 @@
+version: "1.0"
+
+# Authentication patterns and examples
+
+variables:
+  BASE_URL: "https://api.example.com"
+  USERNAME: "${USERNAME}"  # Environment variable
+  PASSWORD: "${PASSWORD}"  # Environment variable
+  TOKEN: "${AUTH_TOKEN}"   # Environment variable
+
+tests:
+  # 1. Basic Authentication
+  - name: "Basic Auth example"
+    curl: "curl -u ${USERNAME}:${PASSWORD} ${BASE_URL}/protected"
+    assertions:
+      - status: 200
+      - json_path: ".authenticated == true"
+
+  # 2. Bearer Token Authentication
+  - name: "Bearer token auth"
+    request:
+      method: GET
+      url: "${BASE_URL}/user/profile"
+      headers:
+        Authorization: "Bearer ${TOKEN}"
+    assertions:
+      - status: 200
+      - json_path: ".user != null"
+
+  # 3. API Key Authentication (Header)
+  - name: "API Key in header"
+    request:
+      method: GET
+      url: "${BASE_URL}/data"
+      headers:
+        X-API-Key: "${TOKEN}"
+    assertions:
+      - status: 200
+
+  # 4. API Key Authentication (Query Parameter)
+  - name: "API Key in query"
+    request:
+      method: GET
+      url: "${BASE_URL}/data?api_key=${TOKEN}"
+    assertions:
+      - status: 200
+
+  # 5. OAuth 2.0 - Get Access Token
+  - name: "OAuth token request"
+    request:
+      method: POST
+      url: "${BASE_URL}/oauth/token"
+      headers:
+        Content-Type: "application/x-www-form-urlencoded"
+      body: "grant_type=client_credentials&client_id=${USERNAME}&client_secret=${PASSWORD}"
+    assertions:
+      - status: 200
+      - json_path: ".access_token != null"
+      - json_path: ".token_type == 'Bearer'"
+      - json_path: ".expires_in > 0"
+
+  # 6. Session-based Authentication
+  - name: "Login to get session cookie"
+    request:
+      method: POST
+      url: "${BASE_URL}/login"
+      headers:
+        Content-Type: "application/json"
+      body: |
+        {
+          "username": "${USERNAME}",
+          "password": "${PASSWORD}"
+        }
+    assertions:
+      - status: 200
+      - header: "Set-Cookie contains session"
+      - json_path: ".success == true"
+
+  # 7. JWT Token Validation
+  - name: "Access with JWT token"
+    request:
+      method: GET
+      url: "${BASE_URL}/api/protected"
+      headers:
+        Authorization: "Bearer ${TOKEN}"
+    assertions:
+      - status: 200
+      - json_path: ".user.id != null"
+      - header: "Content-Type contains json"
+
+  # 8. Authentication Error - Invalid Credentials
+  - name: "Invalid credentials"
+    request:
+      method: POST
+      url: "${BASE_URL}/login"
+      headers:
+        Content-Type: "application/json"
+      body: |
+        {
+          "username": "wrong",
+          "password": "wrong"
+        }
+    assertions:
+      - status: 401
+      - json_path: ".error != null"
+
+  # 9. Authentication Error - Missing Token
+  - name: "Missing authentication"
+    request:
+      method: GET
+      url: "${BASE_URL}/protected"
+    assertions:
+      - status: 401
+      - body_contains: "unauthorized"
+
+  # 10. Authentication Error - Expired Token
+  - name: "Expired token"
+    request:
+      method: GET
+      url: "${BASE_URL}/protected"
+      headers:
+        Authorization: "Bearer expired_token_here"
+    assertions:
+      - status: 401
+      - json_path: ".error contains 'expired'"

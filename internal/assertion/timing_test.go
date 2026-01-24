@@ -175,10 +175,10 @@ func TestResponseTimeValidator_InvalidDuration(t *testing.T) {
 
 func TestResponseTimeValidator_AllOperators(t *testing.T) {
 	tests := []struct {
-		name        string
+		name         string
 		responseTime time.Duration
-		expression  string
-		shouldPass  bool
+		expression   string
+		shouldPass   bool
 	}{
 		{"LessThan", 400 * time.Millisecond, "< 500ms", true},
 		{"GreaterThan", 600 * time.Millisecond, "> 500ms", true},

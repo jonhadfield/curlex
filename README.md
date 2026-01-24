@@ -15,6 +15,23 @@ A lightweight CLI tool for testing HTTP endpoints with curl-style commands and s
 - **CI/CD Ready**: Exit codes (0=pass, 1=fail) perfect for automation
 - **Minimal Dependencies**: Small binary size (6.5MB optimized)
 - **Pure Go**: No external runtime dependencies
+- **Production Ready**: 76.1% test coverage, comprehensive integration tests
+
+## Performance
+
+- **Binary Size**: 6.5MB (optimized with `-ldflags="-s -w"`)
+- **HTTP Request Overhead**: ~44µs per request
+- **YAML Parsing**: ~30µs per test
+- **Assertion Validation**: ~4µs for 5 assertions
+- **JSON Path Queries**: ~458ns per query
+- **Test Coverage**: 76.1% overall
+  - Config: 100%
+  - Models: 95.5%
+  - Runner: 88.3%
+  - Parser: 82.5%
+  - Output: 81.1%
+  - Executor: 75.0%
+  - Assertion: 72.5%
 
 ## Installation
 

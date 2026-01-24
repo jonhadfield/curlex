@@ -71,7 +71,7 @@ func BenchmarkAssertionEngine(b *testing.B) {
 	suite := &models.TestSuite{
 		Tests: []models.Test{
 			{
-				Name: "Complex Assertions",
+				Name:    "Complex Assertions",
 				Request: &models.StructuredRequest{Method: "GET", URL: server.URL},
 				Assertions: []models.Assertion{
 					{Type: models.AssertionStatus, Value: "200"},
@@ -103,7 +103,7 @@ func BenchmarkJSONPathAssertion(b *testing.B) {
 	suite := &models.TestSuite{
 		Tests: []models.Test{
 			{
-				Name: "JSON Path Tests",
+				Name:    "JSON Path Tests",
 				Request: &models.StructuredRequest{Method: "GET", URL: server.URL},
 				Assertions: []models.Assertion{
 					{Type: models.AssertionJSONPath, Value: "total == 2"},

@@ -8,9 +8,9 @@ import (
 
 // Validation constants for sane defaults
 const (
-	maxTimeout    = 10 * time.Minute
-	maxRetries    = 100
-	maxRedirects  = 1000
+	maxTimeout   = 10 * time.Minute
+	maxRetries   = 100
+	maxRedirects = 1000
 )
 
 // MergeDefaults applies default configuration to a test

@@ -155,8 +155,8 @@ func TestEngine_MixedFailures(t *testing.T) {
 	}
 
 	assertions := []models.Assertion{
-		{Type: models.AssertionStatus, Value: "200"},         // Fail
-		{Type: models.AssertionBodyContains, Value: "error"}, // Pass
+		{Type: models.AssertionStatus, Value: "200"},           // Fail
+		{Type: models.AssertionBodyContains, Value: "error"},   // Pass
 		{Type: models.AssertionResponseTime, Value: "< 500ms"}, // Fail
 	}
 

@@ -103,9 +103,9 @@ func TestAssertion_UnmarshalYAML(t *testing.T) {
 
 func TestAssertion_String(t *testing.T) {
 	tests := []struct {
-		name     string
+		name      string
 		assertion Assertion
-		expected string
+		expected  string
 	}{
 		{
 			name: "status assertion",

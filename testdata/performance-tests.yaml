@@ -1,0 +1,119 @@
+version: "1.0"
+
+# Performance testing and response time validation examples
+
+variables:
+  BASE_URL: "https://api.example.com"
+
+defaults:
+  timeout: 5s
+
+tests:
+  # 1. Fast endpoint - strict timing
+  - name: "Health check should be fast"
+    request:
+      method: GET
+      url: "${BASE_URL}/health"
+    assertions:
+      - status: 200
+      - response_time: "< 100ms"
+
+  # 2. Database query - moderate timing
+  - name: "User list should respond quickly"
+    request:
+      method: GET
+      url: "${BASE_URL}/users"
+    assertions:
+      - status: 200
+      - response_time: "< 500ms"
+      - json_path: ".users != null"
+
+  # 3. Complex query - relaxed timing
+  - name: "Analytics endpoint"
+    request:
+      method: GET
+      url: "${BASE_URL}/analytics?range=30d"
+    assertions:
+      - status: 200
+      - response_time: "< 2s"
+
+  # 4. Upload operation - generous timing
+  - name: "File upload"
+    request:
+      method: POST
+      url: "${BASE_URL}/upload"
+      headers:
+        Content-Type: "application/octet-stream"
+      body: "test file content"
+    assertions:
+      - status: 201
+      - response_time: "< 5s"
+
+  # 5. Minimum performance threshold
+  - name: "API should respond within 1 second"
+    request:
+      method: GET
+      url: "${BASE_URL}/data"
+    assertions:
+      - status: 200
+      - response_time: ">= 0ms && < 1s"
+
+  # 6. Consistent performance
+  - name: "Cached endpoint should be very fast"
+    request:
+      method: GET
+      url: "${BASE_URL}/config"
+      headers:
+        If-None-Modified-Since: "Mon, 01 Jan 2024 00:00:00 GMT"
+    assertions:
+      - status: 304
+      - response_time: "< 50ms"
+
+  # 7. Load test - multiple similar requests
+  - name: "GET /products (test 1)"
+    request:
+      method: GET
+      url: "${BASE_URL}/products?page=1"
+    assertions:
+      - status: 200
+      - response_time: "< 800ms"
+
+  - name: "GET /products (test 2)"
+    request:
+      method: GET
+      url: "${BASE_URL}/products?page=2"
+    assertions:
+      - status: 200
+      - response_time: "< 800ms"
+
+  - name: "GET /products (test 3)"
+    request:
+      method: GET
+      url: "${BASE_URL}/products?page=3"
+    assertions:
+      - status: 200
+      - response_time: "< 800ms"
+
+  # 8. Search performance
+  - name: "Search should be fast"
+    request:
+      method: GET
+      url: "${BASE_URL}/search?q=test&limit=10"
+    assertions:
+      - status: 200
+      - json_path: ".results != null"
+      - response_time: "< 300ms"
+
+  # 9. API rate limiting check
+  - name: "Rate limited endpoint"
+    request:
+      method: GET
+      url: "${BASE_URL}/api/data"
+      headers:
+        X-API-Key: "test-key"
+    retries: 3
+    retry_delay: "1s"
+    retry_on_status: [429, 503]
+    assertions:
+      - status: 200
+      - response_time: "< 1s"

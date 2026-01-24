@@ -37,13 +37,13 @@ func (f AssertionFailure) String() string {
 
 // SuiteResult represents the overall test suite execution results
 type SuiteResult struct {
-	Results      []TestResult
-	TotalTests   int
-	PassedTests  int
-	FailedTests  int
-	TotalTime    time.Duration
-	StartTime    time.Time
-	EndTime      time.Time
+	Results     []TestResult
+	TotalTests  int
+	PassedTests int
+	FailedTests int
+	TotalTime   time.Duration
+	StartTime   time.Time
+	EndTime     time.Time
 }
 
 // HasFailures returns true if any test failed

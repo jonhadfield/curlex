@@ -1,0 +1,134 @@
+version: "1.0"
+
+# Real-world API testing examples showing common patterns
+
+variables:
+  BASE_URL: "https://api.example.com"
+  API_KEY: "${API_KEY}"  # Set via environment variable
+
+defaults:
+  timeout: 30s
+  retries: 1
+  headers:
+    User-Agent: "curlex/1.0"
+
+tests:
+  # 1. GET request with query parameters
+  - name: "List users with pagination"
+    request:
+      method: GET
+      url: "${BASE_URL}/users?page=1&limit=10"
+      headers:
+        Authorization: "Bearer ${API_KEY}"
+    assertions:
+      - status: 200
+      - json_path: ".users != null"
+      - json_path: ".total > 0"
+      - header: "Content-Type contains application/json"
+      - response_time: "< 1s"
+
+  # 2. POST request with JSON body
+  - name: "Create new user"
+    request:
+      method: POST
+      url: "${BASE_URL}/users"
+      headers:
+        Authorization: "Bearer ${API_KEY}"
+        Content-Type: "application/json"
+      body: |
+        {
+          "name": "John Doe",
+          "email": "john@example.com",
+          "role": "user"
+        }
+    assertions:
+      - status: 201
+      - json_path: ".id != null"
+      - json_path: ".name == 'John Doe'"
+      - json_path: ".email == 'john@example.com'"
+      - header: "Location != ''"
+
+  # 3. PUT request to update resource
+  - name: "Update user details"
+    request:
+      method: PUT
+      url: "${BASE_URL}/users/123"
+      headers:
+        Authorization: "Bearer ${API_KEY}"
+        Content-Type: "application/json"
+      body: |
+        {
+          "name": "Jane Doe",
+          "email": "jane@example.com"
+        }
+    assertions:
+      - status: 200
+      - json_path: ".id == 123"
+      - json_path: ".name == 'Jane Doe'"
+
+  # 4. DELETE request
+  - name: "Delete user"
+    request:
+      method: DELETE
+      url: "${BASE_URL}/users/123"
+      headers:
+        Authorization: "Bearer ${API_KEY}"
+    assertions:
+      - status: 204
+
+  # 5. Error handling - not found
+  - name: "Get non-existent user"
+    request:
+      method: GET
+      url: "${BASE_URL}/users/99999"
+      headers:
+        Authorization: "Bearer ${API_KEY}"
+    assertions:
+      - status: 404
+      - json_path: ".error != null"
+
+  # 6. Error handling - validation error
+  - name: "Create user with invalid data"
+    request:
+      method: POST
+      url: "${BASE_URL}/users"
+      headers:
+        Authorization: "Bearer ${API_KEY}"
+        Content-Type: "application/json"
+      body: |
+        {
+          "name": "",
+          "email": "not-an-email"
+        }
+    assertions:
+      - status: 400
+      - json_path: ".errors != null"
+
+  # 7. Complex JSON validation
+  - name: "Get user with nested data"
+    request:
+      method: GET
+      url: "${BASE_URL}/users/123"
+      headers:
+        Authorization: "Bearer ${API_KEY}"
+    assertions:
+      - status: 200
+      - json_path: ".id == 123"
+      - json_path: ".profile != null"
+      - json_path: ".profile.verified == true"
+      - json_path: ".roles[0] == 'admin'"
+      - json_path: ".metadata.created_at != null"
+
+  # 8. Search with filters
+  - name: "Search users"
+    request:
+      method: GET
+      url: "${BASE_URL}/users?search=john&active=true"
+      headers:
+        Authorization: "Bearer ${API_KEY}"
+    assertions:
+      - status: 200
+      - json_path: ".results != null"
+      - json_path: ".results[0].name contains 'John'"
+      - json_path: ".results[0].active == true"
+      - response_time: "< 500ms"
