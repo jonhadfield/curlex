@@ -9,6 +9,25 @@ import (
 	"curlex/internal/models"
 )
 
+// Pre-compiled regex patterns for status code comparisons
+var (
+	// "operator number" patterns (actual is left operand)
+	statusPatternGTE     = regexp.MustCompile(`^\s*>=\s*(\d+)`)
+	statusPatternLTE     = regexp.MustCompile(`^\s*<=\s*(\d+)`)
+	statusPatternGT      = regexp.MustCompile(`^\s*>\s*(\d+)`)
+	statusPatternLT      = regexp.MustCompile(`^\s*<\s*(\d+)`)
+	statusPatternEQ      = regexp.MustCompile(`^\s*==\s*(\d+)`)
+	statusPatternNEQ     = regexp.MustCompile(`^\s*!=\s*(\d+)`)
+
+	// "number operator number" patterns
+	statusPatternNumGTE  = regexp.MustCompile(`(\d+)\s*>=\s*(\d+)`)
+	statusPatternNumLTE  = regexp.MustCompile(`(\d+)\s*<=\s*(\d+)`)
+	statusPatternNumGT   = regexp.MustCompile(`(\d+)\s*>\s*(\d+)`)
+	statusPatternNumLT   = regexp.MustCompile(`(\d+)\s*<\s*(\d+)`)
+	statusPatternNumEQ   = regexp.MustCompile(`(\d+)\s*==\s*(\d+)`)
+	statusPatternNumNEQ  = regexp.MustCompile(`(\d+)\s*!=\s*(\d+)`)
+)
+
 // StatusValidator validates HTTP status code assertions
 type StatusValidator struct{}
 
@@ -64,8 +83,10 @@ func (v *StatusValidator) isExpression(s string) bool {
 // evaluateExpression evaluates a status code expression
 // Supports: ==, !=, >, <, >=, <=, &&, ||
 func (v *StatusValidator) evaluateExpression(expr string, actual int) bool {
-	// Replace 'status' variable with actual value
-	expr = strings.ReplaceAll(expr, "status", strconv.Itoa(actual))
+	// Replace 'status' variable with actual value only if present
+	if strings.Contains(expr, "status") {
+		expr = strings.ReplaceAll(expr, "status", strconv.Itoa(actual))
+	}
 
 	// Handle compound expressions with && and ||
 	if strings.Contains(expr, "&&") {
@@ -100,79 +121,79 @@ func (v *StatusValidator) evaluateSingleExpression(expr string, actual int) bool
 
 	// Try pattern: "operator number" (actual is left operand)
 	// >= operator
-	if match := v.extractComparison(expr, `^\s*>=\s*(\d+)`); match != nil {
+	if match := v.extractComparisonRe(expr, statusPatternGTE); match != nil {
 		right, _ := strconv.Atoi(match[1])
 		return actual >= right
 	}
 
 	// <= operator
-	if match := v.extractComparison(expr, `^\s*<=\s*(\d+)`); match != nil {
+	if match := v.extractComparisonRe(expr, statusPatternLTE); match != nil {
 		right, _ := strconv.Atoi(match[1])
 		return actual <= right
 	}
 
 	// > operator
-	if match := v.extractComparison(expr, `^\s*>\s*(\d+)`); match != nil {
+	if match := v.extractComparisonRe(expr, statusPatternGT); match != nil {
 		right, _ := strconv.Atoi(match[1])
 		return actual > right
 	}
 
 	// < operator
-	if match := v.extractComparison(expr, `^\s*<\s*(\d+)`); match != nil {
+	if match := v.extractComparisonRe(expr, statusPatternLT); match != nil {
 		right, _ := strconv.Atoi(match[1])
 		return actual < right
 	}
 
 	// == operator
-	if match := v.extractComparison(expr, `^\s*==\s*(\d+)`); match != nil {
+	if match := v.extractComparisonRe(expr, statusPatternEQ); match != nil {
 		right, _ := strconv.Atoi(match[1])
 		return actual == right
 	}
 
 	// != operator
-	if match := v.extractComparison(expr, `^\s*!=\s*(\d+)`); match != nil {
+	if match := v.extractComparisonRe(expr, statusPatternNEQ); match != nil {
 		right, _ := strconv.Atoi(match[1])
 		return actual != right
 	}
 
 	// Try pattern: "number operator number"
 	// >= operator
-	if match := v.extractComparison(expr, `(\d+)\s*>=\s*(\d+)`); match != nil {
+	if match := v.extractComparisonRe(expr, statusPatternNumGTE); match != nil {
 		left, _ := strconv.Atoi(match[1])
 		right, _ := strconv.Atoi(match[2])
 		return left >= right
 	}
 
 	// <= operator
-	if match := v.extractComparison(expr, `(\d+)\s*<=\s*(\d+)`); match != nil {
+	if match := v.extractComparisonRe(expr, statusPatternNumLTE); match != nil {
 		left, _ := strconv.Atoi(match[1])
 		right, _ := strconv.Atoi(match[2])
 		return left <= right
 	}
 
 	// > operator
-	if match := v.extractComparison(expr, `(\d+)\s*>\s*(\d+)`); match != nil {
+	if match := v.extractComparisonRe(expr, statusPatternNumGT); match != nil {
 		left, _ := strconv.Atoi(match[1])
 		right, _ := strconv.Atoi(match[2])
 		return left > right
 	}
 
 	// < operator
-	if match := v.extractComparison(expr, `(\d+)\s*<\s*(\d+)`); match != nil {
+	if match := v.extractComparisonRe(expr, statusPatternNumLT); match != nil {
 		left, _ := strconv.Atoi(match[1])
 		right, _ := strconv.Atoi(match[2])
 		return left < right
 	}
 
 	// == operator
-	if match := v.extractComparison(expr, `(\d+)\s*==\s*(\d+)`); match != nil {
+	if match := v.extractComparisonRe(expr, statusPatternNumEQ); match != nil {
 		left, _ := strconv.Atoi(match[1])
 		right, _ := strconv.Atoi(match[2])
 		return left == right
 	}
 
 	// != operator
-	if match := v.extractComparison(expr, `(\d+)\s*!=\s*(\d+)`); match != nil {
+	if match := v.extractComparisonRe(expr, statusPatternNumNEQ); match != nil {
 		left, _ := strconv.Atoi(match[1])
 		right, _ := strconv.Atoi(match[2])
 		return left != right
@@ -181,9 +202,8 @@ func (v *StatusValidator) evaluateSingleExpression(expr string, actual int) bool
 	return false
 }
 
-// extractComparison extracts comparison operands from expression
-func (v *StatusValidator) extractComparison(expr, pattern string) []string {
-	re := regexp.MustCompile(pattern)
+// extractComparisonRe extracts comparison operands using pre-compiled regex
+func (v *StatusValidator) extractComparisonRe(expr string, re *regexp.Regexp) []string {
 	matches := re.FindStringSubmatch(expr)
 	if len(matches) >= 2 {
 		return matches

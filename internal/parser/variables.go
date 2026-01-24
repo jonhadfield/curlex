@@ -8,6 +8,9 @@ import (
 	"curlex/internal/models"
 )
 
+// Pre-compiled regex pattern for variable substitution
+var variablePattern = regexp.MustCompile(`\$\{([^}]+)\}`)
+
 // VariableExpander handles variable substitution in test suites
 type VariableExpander struct {
 	variables map[string]string
@@ -81,10 +84,7 @@ func (ve *VariableExpander) expandTest(test *models.Test) error {
 
 // expandString replaces ${VAR_NAME} with variable values
 func (ve *VariableExpander) expandString(s string) string {
-	// Pattern: ${VAR_NAME}
-	pattern := regexp.MustCompile(`\$\{([^}]+)\}`)
-
-	return pattern.ReplaceAllStringFunc(s, func(match string) string {
+	return variablePattern.ReplaceAllStringFunc(s, func(match string) string {
 		// Extract variable name (remove ${ and })
 		varName := match[2 : len(match)-1]
 

@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"curlex/internal/config"
@@ -57,8 +59,10 @@ func run(cfg *config.Config) int {
 		progress.Start()
 	}
 
-	// Execute tests (parallel or sequential)
-	ctx := context.Background()
+	// Execute tests (parallel or sequential) with graceful shutdown on SIGINT/SIGTERM
+	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer cancel()
+
 	var suiteResult *models.SuiteResult
 	if cfg.Parallel {
 		suiteResult, err = testRunner.RunParallel(ctx, suite, cfg.Concurrency, cfg.FailFast)
@@ -69,6 +73,11 @@ func run(cfg *config.Config) int {
 	// Stop progress indicator
 	if progress != nil {
 		progress.Stop()
+	}
+
+	// Check if execution was interrupted
+	if ctx.Err() == context.Canceled {
+		fmt.Fprintf(os.Stderr, "\nTest execution interrupted - returning partial results\n")
 	}
 
 	if err != nil {

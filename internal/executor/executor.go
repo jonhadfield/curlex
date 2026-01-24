@@ -39,7 +39,7 @@ func (e *Executor) Execute(ctx context.Context, test models.Test) (*models.TestR
 	// Prepare the request
 	preparedReq, err := e.prepareRequest(test)
 	if err != nil {
-		result.Error = err
+		result.Error = fmt.Errorf("failed to prepare request: %w", err)
 		result.Success = false
 		return result, nil
 	}
@@ -50,7 +50,7 @@ func (e *Executor) Execute(ctx context.Context, test models.Test) (*models.TestR
 	// Create HTTP request
 	httpReq, err := e.createHTTPRequest(ctx, preparedReq)
 	if err != nil {
-		result.Error = err
+		result.Error = fmt.Errorf("failed to create HTTP request: %w", err)
 		result.Success = false
 		return result, nil
 	}
@@ -149,11 +149,19 @@ func (e *Executor) createClientWithRedirects(maxRedirects int) *http.Client {
 	if maxRedirects == 0 {
 		// No redirects allowed
 		client.CheckRedirect = func(req *http.Request, via []*http.Request) error {
+			// Check if context was cancelled
+			if req.Context().Err() != nil {
+				return req.Context().Err()
+			}
 			return http.ErrUseLastResponse
 		}
 	} else if maxRedirects > 0 {
 		// Limit number of redirects
 		client.CheckRedirect = func(req *http.Request, via []*http.Request) error {
+			// Check if context was cancelled
+			if req.Context().Err() != nil {
+				return req.Context().Err()
+			}
 			if len(via) >= maxRedirects {
 				return fmt.Errorf("stopped after %d redirects", maxRedirects)
 			}

@@ -65,7 +65,12 @@ func (p *Progress) Stop() {
 	p.active = false
 	p.mu.Unlock()
 
-	p.done <- true
+	// Send done signal with timeout to avoid deadlock if render() already exited
+	select {
+	case p.done <- true:
+	case <-time.After(100 * time.Millisecond):
+		// Goroutine already exited, no need to signal
+	}
 	p.clear()
 }
 

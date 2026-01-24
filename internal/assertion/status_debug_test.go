@@ -9,10 +9,9 @@ func TestDebugExtractComparison(t *testing.T) {
 	validator := &StatusValidator{}
 
 	expr := ">= 200"
-	pattern := `^\s*>=\s*(\d+)`
 
-	match := validator.extractComparison(expr, pattern)
-	fmt.Printf("expr: %q, pattern: %q\n", expr, pattern)
+	match := validator.extractComparisonRe(expr, statusPatternGTE)
+	fmt.Printf("expr: %q, pattern: statusPatternGTE\n", expr)
 	fmt.Printf("match: %v\n", match)
 
 	if match != nil {

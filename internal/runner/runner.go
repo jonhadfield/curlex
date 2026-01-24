@@ -2,6 +2,8 @@ package runner
 
 import (
 	"context"
+	"fmt"
+	"os"
 	"time"
 
 	"curlex/internal/assertion"
@@ -53,8 +55,10 @@ func (r *Runner) Run(ctx context.Context, suite *models.TestSuite) (*models.Suit
 
 		// Log request/response if logging is enabled
 		if r.logger != nil {
-			_ = r.logger.LogTest(*result, result.PreparedRequest)
-			// Ignore logging errors - don't fail the test because of logging issues
+			if err := r.logger.LogTest(*result, result.PreparedRequest); err != nil {
+				// Don't fail the test, but warn the user about logging issues
+				fmt.Fprintf(os.Stderr, "Warning: failed to write log file: %v\n", err)
+			}
 		}
 
 		results = append(results, *result)

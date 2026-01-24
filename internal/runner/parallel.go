@@ -2,6 +2,8 @@ package runner
 
 import (
 	"context"
+	"fmt"
+	"os"
 	"sync"
 	"time"
 
@@ -17,9 +19,11 @@ func (r *Runner) RunParallel(ctx context.Context, suite *models.TestSuite, concu
 		concurrency = 10
 	}
 
-	// Create channels for work distribution
-	jobs := make(chan models.Test, len(suite.Tests))
-	results := make(chan models.TestResult, len(suite.Tests))
+	// Create channels for work distribution with bounded buffers
+	// Use smaller buffers to avoid excessive memory usage for large test suites
+	bufferSize := min(len(suite.Tests), concurrency*2)
+	jobs := make(chan models.Test, bufferSize)
+	results := make(chan models.TestResult, bufferSize)
 
 	// Context for cancellation (fail-fast)
 	runCtx, cancel := context.WithCancel(ctx)
@@ -59,7 +63,10 @@ func (r *Runner) RunParallel(ctx context.Context, suite *models.TestSuite, concu
 
 				// Log request/response if logging is enabled
 				if r.logger != nil {
-					_ = r.logger.LogTest(*result, result.PreparedRequest)
+					if err := r.logger.LogTest(*result, result.PreparedRequest); err != nil {
+						// Don't fail the test, but warn the user about logging issues
+						fmt.Fprintf(os.Stderr, "Warning: failed to write log file: %v\n", err)
+					}
 				}
 
 				// Send result
@@ -100,9 +107,34 @@ func (r *Runner) RunParallel(ctx context.Context, suite *models.TestSuite, concu
 		close(results)
 	}()
 
-	for result := range results {
-		testResults = append(testResults, result)
+	// Collect results with context awareness for early exit
+	for {
+		select {
+		case result, ok := <-results:
+			if !ok {
+				// Channel closed, all results collected
+				goto done
+			}
+			testResults = append(testResults, result)
+		case <-runCtx.Done():
+			// Context cancelled, return partial results
+			// Wait a moment for any in-flight results
+			time.Sleep(100 * time.Millisecond)
+			// Drain remaining results
+			for {
+				select {
+				case result, ok := <-results:
+					if !ok {
+						goto done
+					}
+					testResults = append(testResults, result)
+				default:
+					goto done
+				}
+			}
+		}
 	}
+done:
 
 	endTime := time.Now()
 

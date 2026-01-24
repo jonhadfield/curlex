@@ -1,20 +1,39 @@
 package parser
 
 import (
+	"time"
+
 	"curlex/internal/models"
+)
+
+// Validation constants for sane defaults
+const (
+	maxTimeout    = 10 * time.Minute
+	maxRetries    = 100
+	maxRedirects  = 1000
 )
 
 // MergeDefaults applies default configuration to a test
 // Test-level settings override defaults
 func MergeDefaults(test *models.Test, defaults models.DefaultConfig) {
-	// Apply timeout if not set on test
+	// Apply timeout if not set on test (with validation)
 	if test.Timeout == 0 && defaults.Timeout > 0 {
-		test.Timeout = defaults.Timeout
+		// Cap timeout at reasonable maximum
+		if defaults.Timeout > maxTimeout {
+			test.Timeout = maxTimeout
+		} else {
+			test.Timeout = defaults.Timeout
+		}
 	}
 
-	// Apply retries if not set on test
+	// Apply retries if not set on test (with validation)
 	if test.Retries == 0 && defaults.Retries > 0 {
-		test.Retries = defaults.Retries
+		// Cap retries at reasonable maximum
+		if defaults.Retries > maxRetries {
+			test.Retries = maxRetries
+		} else {
+			test.Retries = defaults.Retries
+		}
 	}
 
 	// Apply retry_delay if not set on test
@@ -33,9 +52,13 @@ func MergeDefaults(test *models.Test, defaults models.DefaultConfig) {
 		copy(test.RetryOnStatus, defaults.RetryOnStatus)
 	}
 
-	// Apply max_redirects if not set on test
+	// Apply max_redirects if not set on test (with validation)
 	if test.MaxRedirects == nil && defaults.MaxRedirects != nil {
 		redirects := *defaults.MaxRedirects
+		// Validate redirect count is sane (allow -1 for unlimited)
+		if redirects > maxRedirects && redirects != -1 {
+			redirects = maxRedirects
+		}
 		test.MaxRedirects = &redirects
 	}
 
