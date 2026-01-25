@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"net/http/httptest"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -79,9 +80,9 @@ func TestRunner_Integration_Sequential(t *testing.T) {
 
 func TestRunner_Integration_Parallel(t *testing.T) {
 	// Create test HTTP server
-	callCount := 0
+	var callCount int32
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		callCount++
+		atomic.AddInt32(&callCount, 1)
 		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write([]byte(`{"id":1}`))
 	}))
@@ -122,8 +123,8 @@ func TestRunner_Integration_Parallel(t *testing.T) {
 	}
 
 	// Verify all tests were actually called
-	if callCount != 5 {
-		t.Errorf("Expected 5 HTTP calls, got %d", callCount)
+	if atomic.LoadInt32(&callCount) != 5 {
+		t.Errorf("Expected 5 HTTP calls, got %d", atomic.LoadInt32(&callCount))
 	}
 }
 

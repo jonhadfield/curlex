@@ -8,6 +8,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"sync/atomic"
 	"testing"
 	"time"
 )
@@ -291,12 +292,12 @@ tests:
 
 // TestParallelExecution tests parallel execution mode
 func TestParallelExecution(t *testing.T) {
-	requestCount := 0
+	var requestCount int32
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		requestCount++
+		atomic.AddInt32(&requestCount, 1)
 		time.Sleep(50 * time.Millisecond) // Simulate some work
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"status": "ok"}`))
+		_, _ = w.Write([]byte(`{"status": "ok"}`))
 	}))
 	defer server.Close()
 
@@ -361,16 +362,16 @@ tests:
 
 // TestFailFastMode tests that execution stops on first failure
 func TestFailFastMode(t *testing.T) {
-	executedTests := 0
+	var executedTests int32
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		executedTests++
+		count := atomic.AddInt32(&executedTests, 1)
 		// First request returns 404, rest would return 200
-		if executedTests == 1 {
+		if count == 1 {
 			w.WriteHeader(http.StatusNotFound)
 		} else {
 			w.WriteHeader(http.StatusOK)
 		}
-		w.Write([]byte(`{}`))
+		_, _ = w.Write([]byte(`{}`))
 	}))
 	defer server.Close()
 
