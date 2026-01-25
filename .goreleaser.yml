@@ -71,9 +71,11 @@ brews:
       owner: jonhadfield
       name: homebrew-curlex
       branch: main
+      token: "{{ .Env.HOMEBREW_TAP_TOKEN }}"
     commit_author:
       name: goreleaserbot
       email: bot@goreleaser.com
+    skip_upload: auto
     install: |
       bin.install "curlex"
     test: |
