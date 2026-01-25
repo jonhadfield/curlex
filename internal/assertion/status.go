@@ -45,7 +45,7 @@ func (v *StatusValidator) Validate(result *models.TestResult, assertion models.A
 			Type:     models.AssertionStatus,
 			Expected: expected,
 			Actual:   strconv.Itoa(actual),
-			Message:  fmt.Sprintf("expected status %s, got %d", expected, actual),
+			Message:  "expected status " + expected + ", got " + strconv.Itoa(actual),
 		}
 	}
 

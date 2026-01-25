@@ -2,6 +2,7 @@ package output
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 
@@ -63,7 +64,7 @@ func (f *HumanFormatter) FormatResult(result models.TestResult) string {
 	sb.WriteString(f.indent(
 		fmt.Sprintf("%s %s%s  %s%dms%s",
 			f.colorize(ColorGray, "Status:"),
-			f.colorize(statusColor, fmt.Sprintf("%d", result.StatusCode)),
+			f.colorize(statusColor, strconv.Itoa(result.StatusCode)),
 			ColorReset,
 			f.colorize(ColorGray, ""),
 			result.ResponseTime.Milliseconds(),

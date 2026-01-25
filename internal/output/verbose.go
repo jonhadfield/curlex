@@ -2,6 +2,7 @@ package output
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
 	"curlex/internal/models"
@@ -79,7 +80,7 @@ func (f *VerboseFormatter) FormatResult(result models.TestResult) string {
 		statusColor = ColorYellow
 	}
 	sb.WriteString(fmt.Sprintf("  Status: %s (%dms)\n",
-		f.colorize(statusColor, fmt.Sprintf("%d", result.StatusCode)),
+		f.colorize(statusColor, strconv.Itoa(result.StatusCode)),
 		result.ResponseTime.Milliseconds()))
 
 	// Headers

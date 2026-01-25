@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strconv"
 
 	"curlex/internal/models"
 	"gopkg.in/yaml.v3"
@@ -66,7 +67,7 @@ func (p *YAMLParser) validate(suite *models.TestSuite) error {
 		if test.Curl == "" && test.Request == nil {
 			testID := test.Name
 			if testID == "" {
-				testID = fmt.Sprintf("%d", i)
+				testID = strconv.Itoa(i)
 			}
 			errs = append(errs, fmt.Errorf("test %s: must specify either 'curl' or 'request'", testID))
 		}
@@ -80,7 +81,7 @@ func (p *YAMLParser) validate(suite *models.TestSuite) error {
 		if len(test.Assertions) == 0 {
 			testID := test.Name
 			if testID == "" {
-				testID = fmt.Sprintf("%d", i)
+				testID = strconv.Itoa(i)
 			}
 			errs = append(errs, fmt.Errorf("test %s: must have at least one assertion", testID))
 		}
