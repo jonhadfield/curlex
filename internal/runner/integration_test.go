@@ -16,10 +16,10 @@ func TestRunner_Integration_Sequential(t *testing.T) {
 		switch r.URL.Path {
 		case "/success":
 			w.WriteHeader(http.StatusOK)
-			w.Write([]byte(`{"status":"ok"}`))
+			_, _ = w.Write([]byte(`{"status":"ok"}`))
 		case "/not-found":
 			w.WriteHeader(http.StatusNotFound)
-			w.Write([]byte(`{"error":"not found"}`))
+			_, _ = w.Write([]byte(`{"error":"not found"}`))
 		case "/redirect":
 			http.Redirect(w, r, "/success", http.StatusFound)
 		default:
@@ -83,7 +83,7 @@ func TestRunner_Integration_Parallel(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		callCount++
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"id":1}`))
+		_, _ = w.Write([]byte(`{"id":1}`))
 	}))
 	defer server.Close()
 
@@ -179,7 +179,7 @@ func TestRunner_Integration_Redirect(t *testing.T) {
 			return
 		}
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("redirected"))
+		_, _ = w.Write([]byte("redirected"))
 	}))
 	defer server.Close()
 

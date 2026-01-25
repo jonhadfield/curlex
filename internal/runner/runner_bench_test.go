@@ -13,7 +13,7 @@ import (
 func BenchmarkSequentialExecution(b *testing.B) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"status":"ok"}`))
+		_, _ = w.Write([]byte(`{"status":"ok"}`))
 	}))
 	defer server.Close()
 
@@ -38,7 +38,7 @@ func BenchmarkSequentialExecution(b *testing.B) {
 func BenchmarkParallelExecution(b *testing.B) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"status":"ok"}`))
+		_, _ = w.Write([]byte(`{"status":"ok"}`))
 	}))
 	defer server.Close()
 
@@ -64,7 +64,7 @@ func BenchmarkAssertionEngine(b *testing.B) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"id":123,"name":"test","active":true}`))
+		_, _ = w.Write([]byte(`{"id":123,"name":"test","active":true}`))
 	}))
 	defer server.Close()
 
@@ -96,7 +96,7 @@ func BenchmarkAssertionEngine(b *testing.B) {
 func BenchmarkJSONPathAssertion(b *testing.B) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"users":[{"id":1,"name":"Alice"},{"id":2,"name":"Bob"}],"total":2}`))
+		_, _ = w.Write([]byte(`{"users":[{"id":1,"name":"Alice"},{"id":2,"name":"Bob"}],"total":2}`))
 	}))
 	defer server.Close()
 

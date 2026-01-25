@@ -219,13 +219,16 @@ func TestVariableExpander_ExpandTest(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			expander.expandTest(&tt.test)
+			err := expander.expandTest(&tt.test)
+			if err != nil {
+				t.Fatalf("expandTest() error = %v", err)
+			}
 
 			if tt.test.Curl != tt.want.Curl {
 				t.Errorf("Curl = %v, want %v", tt.test.Curl, tt.want.Curl)
 			}
 
-			if tt.test.Request != nil {
+			if tt.test.Request != nil && tt.want.Request != nil {
 				if tt.test.Request.URL != tt.want.Request.URL {
 					t.Errorf("URL = %v, want %v", tt.test.Request.URL, tt.want.Request.URL)
 				}
