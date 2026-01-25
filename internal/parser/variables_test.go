@@ -9,8 +9,8 @@ import (
 
 func TestVariableExpander_ExpandVariables(t *testing.T) {
 	// Set environment variable for testing
-	os.Setenv("TEST_VAR", "test_value")
-	defer os.Unsetenv("TEST_VAR")
+	_ = os.Setenv("TEST_VAR", "test_value")
+	defer func() { _ = os.Unsetenv("TEST_VAR") }()
 
 	tests := []struct {
 		name        string

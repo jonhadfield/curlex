@@ -21,7 +21,7 @@ func TestBasicHTTPRequest(t *testing.T) {
 			t.Errorf("Expected GET request, got %s", r.Method)
 		}
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"status": "ok"}`))
+		_, _ = w.Write([]byte(`{"status": "ok"}`))
 	}))
 	defer server.Close()
 
@@ -83,7 +83,7 @@ func TestAllAssertionTypes(t *testing.T) {
 		w.Header().Set("X-Custom-Header", "test-value")
 		w.WriteHeader(http.StatusOK)
 		time.Sleep(10 * time.Millisecond) // Small delay for response_time assertion
-		w.Write([]byte(`{"id": 123, "name": "test", "active": true}`))
+		_, _ = w.Write([]byte(`{"id": 123, "name": "test", "active": true}`))
 	}))
 	defer server.Close()
 
@@ -135,7 +135,7 @@ tests:
 func TestJSONOutput(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"status": "ok"}`))
+		_, _ = w.Write([]byte(`{"status": "ok"}`))
 	}))
 	defer server.Close()
 
@@ -193,7 +193,7 @@ tests:
 func TestFailedAssertion(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound) // Will fail status assertion
-		w.Write([]byte(`{"error": "not found"}`))
+		_, _ = w.Write([]byte(`{"error": "not found"}`))
 	}))
 	defer server.Close()
 
@@ -242,13 +242,13 @@ tests:
 func TestVariableSubstitution(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"status": "ok"}`))
+		_, _ = w.Write([]byte(`{"status": "ok"}`))
 	}))
 	defer server.Close()
 
 	// Set environment variable
-	os.Setenv("TEST_SERVER_URL", server.URL)
-	defer os.Unsetenv("TEST_SERVER_URL")
+	_ = os.Setenv("TEST_SERVER_URL", server.URL)
+	defer func() { _ = os.Unsetenv("TEST_SERVER_URL") }()
 
 	tmpDir := t.TempDir()
 	testFile := filepath.Join(tmpDir, "test.yaml")

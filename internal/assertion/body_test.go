@@ -40,7 +40,7 @@ func TestBodyValidator_ExactMismatch(t *testing.T) {
 
 	failure := validator.Validate(result, assertion)
 	if failure == nil {
-		t.Error("Expected failure, got none")
+		t.Fatal("Expected failure, got none")
 	}
 
 	if failure.Type != models.AssertionBody {
@@ -111,7 +111,7 @@ func TestBodyContainsValidator_Failure(t *testing.T) {
 
 	failure := validator.Validate(result, assertion)
 	if failure == nil {
-		t.Error("Expected failure, got none")
+		t.Fatal("Expected failure, got none")
 	}
 
 	if failure.Type != models.AssertionBodyContains {

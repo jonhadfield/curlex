@@ -105,7 +105,7 @@ func (p *Progress) render() {
 			}
 
 			// Print with carriage return to overwrite
-			fmt.Fprintf(p.writer, "\r%s", display)
+			_, _ = fmt.Fprintf(p.writer, "\r%s", display)
 
 			frameIdx = (frameIdx + 1) % len(spinnerFrames)
 		}
@@ -151,5 +151,5 @@ func (p *Progress) clear() {
 		return
 	}
 	// Clear line and move cursor to beginning
-	fmt.Fprintf(p.writer, "\r\033[K")
+	_, _ = fmt.Fprintf(p.writer, "\r\033[K")
 }

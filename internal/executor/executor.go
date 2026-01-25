@@ -71,7 +71,7 @@ func (e *Executor) Execute(ctx context.Context, test models.Test) (*models.TestR
 		result.Success = false
 		return result, nil
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	// Read response body
 	body, err := io.ReadAll(resp.Body)

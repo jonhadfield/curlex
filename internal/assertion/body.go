@@ -23,7 +23,7 @@ func (v *BodyValidator) Validate(result *models.TestResult, assertion models.Ass
 		Type:     models.AssertionBody,
 		Expected: expected,
 		Actual:   v.truncate(actual, 100),
-		Message:  fmt.Sprintf("body mismatch: expected exact match"),
+		Message:  "body mismatch: expected exact match",
 	}
 }
 

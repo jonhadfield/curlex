@@ -37,7 +37,7 @@ func TestExecutor_Execute_GET(t *testing.T) {
 			t.Errorf("Expected GET request, got %s", r.Method)
 		}
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"status": "ok"}`))
+		_, _ = w.Write([]byte(`{"status": "ok"}`))
 	}))
 	defer server.Close()
 
@@ -80,7 +80,7 @@ func TestExecutor_Execute_POST(t *testing.T) {
 			t.Errorf("Unexpected body: %s", string(body))
 		}
 		w.WriteHeader(http.StatusCreated)
-		w.Write([]byte(`{"id": 123}`))
+		_, _ = w.Write([]byte(`{"id": 123}`))
 	}))
 	defer server.Close()
 
@@ -147,7 +147,7 @@ func TestExecutor_Execute_CurlCommand(t *testing.T) {
 	// Create test server
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("success"))
+		_, _ = w.Write([]byte("success"))
 	}))
 	defer server.Close()
 
@@ -174,7 +174,7 @@ func TestExecutor_Execute_Redirect_NoFollow(t *testing.T) {
 	// Create redirect server
 	targetServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("final"))
+		_, _ = w.Write([]byte("final"))
 	}))
 	defer targetServer.Close()
 
@@ -209,7 +209,7 @@ func TestExecutor_Execute_Redirect_Limited(t *testing.T) {
 	// Create chain of redirects
 	finalServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("final"))
+		_, _ = w.Write([]byte("final"))
 	}))
 	defer finalServer.Close()
 
@@ -320,7 +320,7 @@ func TestExecutor_Execute_ServerError(t *testing.T) {
 	// Create server that returns 500
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("Internal Server Error"))
+		_, _ = w.Write([]byte("Internal Server Error"))
 	}))
 	defer server.Close()
 

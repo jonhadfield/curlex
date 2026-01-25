@@ -122,7 +122,7 @@ func TestHeaderValidator_HeaderNotFound(t *testing.T) {
 
 	failure := validator.Validate(result, assertion)
 	if failure == nil {
-		t.Error("Expected failure for missing header")
+		t.Fatal("Expected failure for missing header")
 	}
 
 	if failure.Actual != "header not found" {

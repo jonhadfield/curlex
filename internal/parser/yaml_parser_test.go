@@ -210,8 +210,8 @@ tests:
 
 func TestYAMLParser_Parse_WithVariables(t *testing.T) {
 	// Set environment variable
-	os.Setenv("API_URL", "https://api.example.com")
-	defer os.Unsetenv("API_URL")
+	_ = os.Setenv("API_URL", "https://api.example.com")
+	defer func() { _ = os.Unsetenv("API_URL") }()
 
 	content := `version: "1.0"
 variables:
