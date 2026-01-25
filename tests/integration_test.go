@@ -7,11 +7,20 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"sync/atomic"
 	"testing"
 	"time"
 )
+
+// binaryName returns the correct binary name for the current OS
+func binaryName(name string) string {
+	if runtime.GOOS == "windows" {
+		return name + ".exe"
+	}
+	return name
+}
 
 // TestBasicHTTPRequest tests a simple GET request end-to-end
 func TestBasicHTTPRequest(t *testing.T) {
@@ -47,14 +56,14 @@ tests:
 	if err != nil {
 		t.Fatal(err)
 	}
-	buildCmd := exec.Command("go", "build", "-o", filepath.Join(tmpDir, "curlex"), "./cmd/curlex")
+	buildCmd := exec.Command("go", "build", "-o", filepath.Join(tmpDir, binaryName("curlex")), "./cmd/curlex")
 	buildCmd.Dir = projectRoot
 	if output, err := buildCmd.CombinedOutput(); err != nil {
 		t.Fatalf("Failed to build curlex: %v\n%s", err, output)
 	}
 
 	// Run curlex
-	cmd := exec.Command(filepath.Join(tmpDir, "curlex"), testFile)
+	cmd := exec.Command(filepath.Join(tmpDir, binaryName("curlex")), testFile)
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		t.Fatalf("curlex failed: %v\n%s", err, output)
@@ -113,13 +122,13 @@ tests:
 	if err != nil {
 		t.Fatal(err)
 	}
-	buildCmd := exec.Command("go", "build", "-o", filepath.Join(tmpDir, "curlex"), "./cmd/curlex")
+	buildCmd := exec.Command("go", "build", "-o", filepath.Join(tmpDir, binaryName("curlex")), "./cmd/curlex")
 	buildCmd.Dir = projectRoot
 	if output, err := buildCmd.CombinedOutput(); err != nil {
 		t.Fatalf("Failed to build: %v\n%s", err, output)
 	}
 
-	cmd := exec.Command(filepath.Join(tmpDir, "curlex"), testFile)
+	cmd := exec.Command(filepath.Join(tmpDir, binaryName("curlex")), testFile)
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		t.Fatalf("curlex failed: %v\n%s", err, output)
@@ -159,13 +168,13 @@ tests:
 	if err != nil {
 		t.Fatal(err)
 	}
-	buildCmd := exec.Command("go", "build", "-o", filepath.Join(tmpDir, "curlex"), "./cmd/curlex")
+	buildCmd := exec.Command("go", "build", "-o", filepath.Join(tmpDir, binaryName("curlex")), "./cmd/curlex")
 	buildCmd.Dir = projectRoot
 	if output, err := buildCmd.CombinedOutput(); err != nil {
 		t.Fatalf("Failed to build: %v\n%s", err, output)
 	}
 
-	cmd := exec.Command(filepath.Join(tmpDir, "curlex"), "--output", "json", testFile)
+	cmd := exec.Command(filepath.Join(tmpDir, binaryName("curlex")), "--output", "json", testFile)
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		t.Fatalf("curlex failed: %v\n%s", err, output)
@@ -217,13 +226,13 @@ tests:
 	if err != nil {
 		t.Fatal(err)
 	}
-	buildCmd := exec.Command("go", "build", "-o", filepath.Join(tmpDir, "curlex"), "./cmd/curlex")
+	buildCmd := exec.Command("go", "build", "-o", filepath.Join(tmpDir, binaryName("curlex")), "./cmd/curlex")
 	buildCmd.Dir = projectRoot
 	if output, err := buildCmd.CombinedOutput(); err != nil {
 		t.Fatalf("Failed to build: %v\n%s", err, output)
 	}
 
-	cmd := exec.Command(filepath.Join(tmpDir, "curlex"), testFile)
+	cmd := exec.Command(filepath.Join(tmpDir, binaryName("curlex")), testFile)
 	output, _ := cmd.CombinedOutput() // Expect error
 
 	// Verify failure exit code
@@ -272,13 +281,13 @@ tests:
 	if err != nil {
 		t.Fatal(err)
 	}
-	buildCmd := exec.Command("go", "build", "-o", filepath.Join(tmpDir, "curlex"), "./cmd/curlex")
+	buildCmd := exec.Command("go", "build", "-o", filepath.Join(tmpDir, binaryName("curlex")), "./cmd/curlex")
 	buildCmd.Dir = projectRoot
 	if output, err := buildCmd.CombinedOutput(); err != nil {
 		t.Fatalf("Failed to build: %v\n%s", err, output)
 	}
 
-	cmd := exec.Command(filepath.Join(tmpDir, "curlex"), testFile)
+	cmd := exec.Command(filepath.Join(tmpDir, binaryName("curlex")), testFile)
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		t.Fatalf("curlex failed: %v\n%s", err, output)
@@ -333,14 +342,14 @@ tests:
 	if err != nil {
 		t.Fatal(err)
 	}
-	buildCmd := exec.Command("go", "build", "-o", filepath.Join(tmpDir, "curlex"), "./cmd/curlex")
+	buildCmd := exec.Command("go", "build", "-o", filepath.Join(tmpDir, binaryName("curlex")), "./cmd/curlex")
 	buildCmd.Dir = projectRoot
 	if output, err := buildCmd.CombinedOutput(); err != nil {
 		t.Fatalf("Failed to build: %v\n%s", err, output)
 	}
 
 	start := time.Now()
-	cmd := exec.Command(filepath.Join(tmpDir, "curlex"), "--parallel", testFile)
+	cmd := exec.Command(filepath.Join(tmpDir, binaryName("curlex")), "--parallel", testFile)
 	output, err := cmd.CombinedOutput()
 	duration := time.Since(start)
 
@@ -407,13 +416,13 @@ tests:
 	if err != nil {
 		t.Fatal(err)
 	}
-	buildCmd := exec.Command("go", "build", "-o", filepath.Join(tmpDir, "curlex"), "./cmd/curlex")
+	buildCmd := exec.Command("go", "build", "-o", filepath.Join(tmpDir, binaryName("curlex")), "./cmd/curlex")
 	buildCmd.Dir = projectRoot
 	if output, err := buildCmd.CombinedOutput(); err != nil {
 		t.Fatalf("Failed to build: %v\n%s", err, output)
 	}
 
-	cmd := exec.Command(filepath.Join(tmpDir, "curlex"), "--fail-fast", testFile)
+	cmd := exec.Command(filepath.Join(tmpDir, binaryName("curlex")), "--fail-fast", testFile)
 	output, _ := cmd.CombinedOutput() // Expect failure
 
 	// Verify exit code is 1
