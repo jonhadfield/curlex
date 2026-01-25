@@ -64,24 +64,25 @@ changelog:
       - test
       - ignore
 
-brews:
-  - name: curlex
-    homepage: https://github.com/jonhadfield/curlex
-    description: >
-      A lightweight CLI tool for testing HTTP endpoints with curl-style commands and structured assertions.
-    repository:
-      owner: jonhadfield
-      name: homebrew-curlex
-      branch: main
-      token: "{{ .Env.HOMEBREW_TAP_TOKEN }}"
-    commit_author:
-      name: goreleaserbot
-      email: bot@goreleaser.com
-    skip_upload: auto
-    install: |
-      bin.install "curlex"
-    test: |
-      system "#{bin}/curlex", "--version"
+# Homebrew tap configuration
+# Uncomment and set HOMEBREW_TAP_TOKEN secret to enable
+# brews:
+#   - name: curlex
+#     homepage: https://github.com/jonhadfield/curlex
+#     description: >
+#       A lightweight CLI tool for testing HTTP endpoints with curl-style commands and structured assertions.
+#     repository:
+#       owner: jonhadfield
+#       name: homebrew-curlex
+#       branch: main
+#       token: "{{ .Env.HOMEBREW_TAP_TOKEN }}"
+#     commit_author:
+#       name: goreleaserbot
+#       email: bot@goreleaser.com
+#     install: |
+#       bin.install "curlex"
+#     test: |
+#       system "#{bin}/curlex", "--version"
 
 announce:
   skip: true
