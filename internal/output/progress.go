@@ -126,7 +126,7 @@ func (p *Progress) formatProgressBar(current, total int, spinner string) string 
 	}
 
 	// Color the spinner cyan, progress bar green
-	spinnerColored := fmt.Sprintf("\033[36m%s\033[0m", spinner)
+	spinnerColored := "\033[36m" + spinner + "\033[0m"
 	barColored := fmt.Sprintf("\033[32m%s\033[90m%s\033[0m",
 		strings.Repeat("█", filled),
 		strings.Repeat("░", barWidth-filled))

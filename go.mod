@@ -1,6 +1,6 @@
 module curlex
 
-go 1.24.0
+go 1.26
 
 require (
 	github.com/tidwall/gjson v1.18.0
