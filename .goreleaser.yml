@@ -53,6 +53,8 @@ release:
     name: curlex
   prerelease: auto
   name_template: "{{ .Tag }}"
+  mode: replace
+  draft: false
 
 changelog:
   sort: asc
