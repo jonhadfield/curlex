@@ -8,3 +8,4 @@ curlex
 !.goreleaser.yml
 !testdata/*.yaml
 *.json
+dist/
