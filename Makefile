@@ -2,7 +2,7 @@
 
 # Binary name
 BINARY_NAME=curlex
-VERSION=1.1.0
+VERSION=1.1.1
 
 # Build the binary
 build:
