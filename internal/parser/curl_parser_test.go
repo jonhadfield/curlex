@@ -52,6 +52,38 @@ func TestCurlParser_ParseCurl(t *testing.T) {
 			headerKey:      "Content-Type",
 			headerValue:    "application/json",
 		},
+		{
+			name:           "single cookie with -b",
+			curl:           `curl -b "session=abc123" https://example.com`,
+			expectedMethod: "GET",
+			expectedURL:    "https://example.com",
+			headerKey:      "Cookie",
+			headerValue:    "session=abc123",
+		},
+		{
+			name:           "single cookie with --cookie",
+			curl:           `curl --cookie "user_id=42" https://example.com`,
+			expectedMethod: "GET",
+			expectedURL:    "https://example.com",
+			headerKey:      "Cookie",
+			headerValue:    "user_id=42",
+		},
+		{
+			name:           "multiple cookies",
+			curl:           `curl -b "session=abc123" -b "user_id=42" https://example.com`,
+			expectedMethod: "GET",
+			expectedURL:    "https://example.com",
+			headerKey:      "Cookie",
+			headerValue:    "session=abc123; user_id=42",
+		},
+		{
+			name:           "multiple cookies mixed flags",
+			curl:           `curl -b "session=abc123" --cookie "user_id=42" -b "theme=dark" https://example.com`,
+			expectedMethod: "GET",
+			expectedURL:    "https://example.com",
+			headerKey:      "Cookie",
+			headerValue:    "session=abc123; theme=dark; user_id=42",
+		},
 	}
 
 	for _, tt := range tests {

@@ -218,6 +218,7 @@ Supported curl flags:
 - `-d, --data` - Request body
 - `-u, --user` - Basic authentication
 - `-A, --user-agent` - User agent
+- `-b, --cookie` - Cookies (multiple instances combined with semicolons)
 - `--json` - Sets JSON content type
 
 #### Option 2: Structured Format
@@ -235,6 +236,44 @@ tests:
     assertions:
       - status: 201
 ```
+
+### Cookie Handling
+
+Curlex supports cookies through both curl commands and structured format:
+
+```yaml
+tests:
+  # Single cookie
+  - name: "Single cookie"
+    curl: "curl -b 'session_id=abc123' https://example.com/api"
+    assertions:
+      - status: 200
+
+  # Multiple cookies (combined with semicolons)
+  - name: "Multiple cookies"
+    curl: "curl -b 'session_id=abc123' -b 'user_id=42' https://example.com/api"
+    # Results in: Cookie: session_id=abc123; user_id=42
+    assertions:
+      - status: 200
+
+  # Long form
+  - name: "Long form cookies"
+    curl: "curl --cookie 'token=xyz' --cookie 'theme=dark' https://example.com/api"
+    assertions:
+      - status: 200
+
+  # Structured format
+  - name: "Cookies in structured format"
+    request:
+      method: GET
+      url: "https://example.com/api"
+      headers:
+        Cookie: "session_id=abc123; user_id=42"
+    assertions:
+      - status: 200
+```
+
+**Note**: Multiple `-b`/`--cookie` flags are automatically combined into a single `Cookie` header with semicolon separation, matching standard HTTP behavior.
 
 ### Assertion Types
 

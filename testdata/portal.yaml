@@ -7,7 +7,7 @@ variables:
 tests:
   # Test 1: Lowercase header name in assertion
   - name: "Header assertion - lowercase"
-    curl: "curl ${BASE_URL}/get"
+    curl: "curl -b 'test1=1' -b 'test2=2' ${BASE_URL}/get"
     assertions:
       - status: 200
       - header: "content-type contains json"  # lowercase header name
@@ -31,6 +31,8 @@ tests:
     request:
       method: GET
       url: "${BASE_URL}/response-headers?X-Custom-Header=TestValue"
+      headers:
+        Cookie: "test1=1; test2=2"
     assertions:
       - status: 200
       - header: "x-custom-header == TestValue"  # lowercase

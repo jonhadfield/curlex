@@ -1,0 +1,69 @@
+version: "1.0"
+
+# Cookie handling examples
+
+variables:
+  BASE_URL: "https://httpbin.org"
+
+tests:
+  # 1. Single cookie with -b flag
+  - name: "Single cookie short flag"
+    curl: "curl -b 'session_id=abc123' ${BASE_URL}/cookies"
+    assertions:
+      - status: 200
+      - json_path: ".cookies.session_id == 'abc123'"
+
+  # 2. Single cookie with --cookie flag
+  - name: "Single cookie long flag"
+    curl: "curl --cookie 'user_pref=dark_mode' ${BASE_URL}/cookies"
+    assertions:
+      - status: 200
+      - json_path: ".cookies.user_pref == 'dark_mode'"
+
+  # 3. Multiple cookies with -b flags
+  - name: "Multiple cookies"
+    curl: "curl -b 'session_id=abc123' -b 'user_id=42' ${BASE_URL}/cookies"
+    assertions:
+      - status: 200
+      - json_path: ".cookies.session_id == 'abc123'"
+      - json_path: ".cookies.user_id == '42'"
+
+  # 4. Multiple cookies mixed short and long flags
+  - name: "Mixed cookie flags"
+    curl: "curl -b 'session_id=abc123' --cookie 'user_id=42' -b 'theme=dark' ${BASE_URL}/cookies"
+    assertions:
+      - status: 200
+      - json_path: ".cookies.session_id == 'abc123'"
+      - json_path: ".cookies.user_id == '42'"
+      - json_path: ".cookies.theme == 'dark'"
+
+  # 5. Cookies with other headers
+  - name: "Cookies with headers"
+    curl: |
+      curl -b 'session_id=abc123' \
+        -H 'User-Agent: curlex/1.0' \
+        -b 'user_id=42' \
+        ${BASE_URL}/cookies
+    assertions:
+      - status: 200
+      - json_path: ".cookies.session_id == 'abc123'"
+      - json_path: ".cookies.user_id == '42'"
+
+  # 6. Cookies in structured request format
+  - name: "Cookies via headers"
+    request:
+      method: GET
+      url: "${BASE_URL}/cookies"
+      headers:
+        Cookie: "session_id=xyz789; user_id=99"
+    assertions:
+      - status: 200
+      - json_path: ".cookies.session_id == 'xyz789'"
+      - json_path: ".cookies.user_id == '99'"
+
+  # 7. Cookie with special characters
+  - name: "Cookie with special chars"
+    curl: "curl -b 'token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9' ${BASE_URL}/cookies"
+    assertions:
+      - status: 200
+      - json_path: ".cookies.token == 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9'"

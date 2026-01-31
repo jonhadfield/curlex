@@ -30,6 +30,8 @@ var (
 	flagUserLong        = regexp.MustCompile(`--user\s+["']([^"']+)["']`)
 	flagUserAgentShort  = regexp.MustCompile(`-A\s+["']([^"']+)["']`)
 	flagUserAgentLong   = regexp.MustCompile(`--user-agent\s+["']([^"']+)["']`)
+	flagCookieShort     = regexp.MustCompile(`-b\s+["']([^"']+)["']`)
+	flagCookieLong      = regexp.MustCompile(`--cookie\s+["']([^"']+)["']`)
 )
 
 // CurlParser parses curl command strings
@@ -166,6 +168,15 @@ func (p *CurlParser) parseFlags(cmd string, req *models.PreparedRequest) error {
 		req.Headers["User-Agent"] = agent
 	} else if agent := p.extractFlagRe(cmd, flagUserAgentLong); agent != "" {
 		req.Headers["User-Agent"] = agent
+	}
+
+	// Parse -b/--cookie "name=value"
+	// Multiple cookies are combined with semicolons
+	cookies := p.extractMultipleFlagsRe(cmd, flagCookieShort)
+	cookies = append(cookies, p.extractMultipleFlagsRe(cmd, flagCookieLong)...)
+	if len(cookies) > 0 {
+		// Combine multiple cookies with semicolons
+		req.Headers["Cookie"] = strings.Join(cookies, "; ")
 	}
 
 	// Parse --json (implies -H "Content-Type: application/json")
